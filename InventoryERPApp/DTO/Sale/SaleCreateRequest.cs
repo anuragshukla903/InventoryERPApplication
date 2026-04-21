@@ -4,10 +4,10 @@ namespace InventoryERPApp.DTO.Sale;
 
 public class SaleCreateRequest
 {
-    [Required] public int CustomerId { get; set; }
+    public int? CustomerId { get; set; }
     [Required] public DateTime Date { get; set; }
-    // public string CustomerName { get; set; }
-    // public string Mobile { get; set; }
+    public string? CustomerName { get; set; }
+    public string? Mobile { get; set; }
     [Required] public List<SaleItemRequest> Items { get; set; } = new();
 }
 

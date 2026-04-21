@@ -21,13 +21,19 @@ public class SaleService : ISaleService
         
         try
         {
+            // Validate request
+            //ValidateSaleRequest(request);
+
             // Validate stock availability before proceeding
             await ValidateStockAvailabilityAsync(request.Items);
+
+            // Get or create customer
+            var customerId = await GetOrCreateCustomerAsync(request);
 
             // Create Sale
             var sale = new Sale
             {
-                CustomerId = request.CustomerId,
+                CustomerId = customerId,
                 Date = request.Date,
                 TotalAmount = request.Items.Sum(item => item.Quantity * item.Rate)
             };
@@ -280,5 +286,40 @@ public class SaleService : ISaleService
             };
             _context.CurrentStocks.Add(currentStock);
         }
+    }
+
+    
+
+    private async Task<int> GetOrCreateCustomerAsync(SaleCreateRequest request)
+    {
+        if (request.CustomerId.HasValue)
+        {
+            // Validate that the customer exists
+            var customer = await _context.Customers.FindAsync(request.CustomerId.Value);
+            if (customer == null)
+            {
+                throw new ArgumentException($"Customer with ID {request.CustomerId.Value} not found.");
+            }
+            return request.CustomerId.Value;
+        }
+
+        // If customer name and mobile are provided, create new customer
+        if (!string.IsNullOrWhiteSpace(request.CustomerName) && !string.IsNullOrWhiteSpace(request.Mobile))
+        {
+            // Create new customer
+            var newCustomer = new Customer
+            {
+                Name = request.CustomerName,
+                Mobile = request.Mobile
+            };
+
+            _context.Customers.Add(newCustomer);
+            await _context.SaveChangesAsync();
+
+            return newCustomer.Id;
+        }
+
+        // Default to walk-in customer with ID=1
+        return 1;
     }
 }
