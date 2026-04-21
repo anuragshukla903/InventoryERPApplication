@@ -27,6 +27,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<ITenantMasterService, TenantMasterService>();
 builder.Services.AddScoped<IMasterService, MasterService>();
+builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
 
 
 
